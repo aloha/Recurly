@@ -5,7 +5,7 @@ Autoloader::map(array(
 ));
 
 // include
-require_once(__DIR__.'/vendor/recurly.php');
+require_once(__DIR__.'/lib/recurly.php');
 
 // load config
 $config = Config::get('recurly');
