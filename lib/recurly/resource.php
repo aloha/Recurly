@@ -60,26 +60,11 @@ abstract class Recurly_Resource extends Recurly_Base
       $this->_client = new Recurly_Client();
 
     $response = $this->_client->request($method, $uri, $this->xml());
-    Recurly_Resource::__parseXmlToUpdateObject($response->body);
-    $response->assertSuccessResponse($this);
-  }
-
-  /**
-   * Delete the object at the given URI.
-   * @param string URI of the object to delete
-   * @param array Additional parameters for the delete
-   */
-  protected function _delete($uri)
-  {
-    if (is_null($this->_client))
-      $this->_client = new Recurly_Client();
-
-    $response = $this->_client->request(Recurly_Client::DELETE, $uri);
-    if($response->body) {
+    $response->assertValidResponse();
+    if (isset($response->body)) {
       Recurly_Resource::__parseXmlToUpdateObject($response->body);
     }
     $response->assertSuccessResponse($this);
-    return true;
   }
 
 
@@ -102,9 +87,7 @@ abstract class Recurly_Resource extends Recurly_Base
         $attribute_node = $node->appendChild($doc->createElement($key));
         $this->populateXmlDoc($doc, $attribute_node, $val, true);
       } else if (is_array($val)) {
-        if (empty($val))
-          continue;
-      	$attribute_node = $node->appendChild($doc->createElement($key));
+        $attribute_node = $node->appendChild($doc->createElement($key));
         foreach ($val as $child => $childValue) {
           if (is_null($child) || is_null($childValue)) {
             continue;
@@ -123,7 +106,7 @@ abstract class Recurly_Resource extends Recurly_Base
               $attribute_node->appendChild($doc->createElement(substr($key, 0, -1), $childValue));
             }
           }
-      	}
+        }
       } else {
         if ($val instanceof DateTime) {
           $val = $val->format('c');
