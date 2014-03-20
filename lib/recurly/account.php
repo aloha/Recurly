@@ -37,10 +37,18 @@ class Recurly_Account extends Recurly_Resource
   }
 
   public function close() {
-    return Recurly_Resource::_delete($this->uri());
+    Recurly_Base::_delete($this->uri(), $this->_client);
+    $this->state = 'closed';
   }
-  public static function closeAccount($accountCode) {
-    return Recurly_Resource::_delete(Recurly_Account::uriForAccount($accountCode));
+  public static function closeAccount($accountCode, $client = null) {
+    return Recurly_Base::_delete(Recurly_Account::uriForAccount($accountCode), $client);
+  }
+
+  public function reopen() {
+    $this->_save(Recurly_Client::PUT, $this->uri() . '/reopen');
+  }
+  public static function reopenAccount($accountCode, $client = null) {
+    return Recurly_Base::_put(Recurly_Account::uriForAccount($accountCode) . '/reopen', $client);
   }
 
   protected function uri() {
